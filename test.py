@@ -17,13 +17,16 @@ from typing import List
 from model import T5Finetuner
 from data import MyDataset, make_sample
 
+import warnings
 if __name__ == '__main__':
+    warnings.filterwarnings("ignore")
+    
     parser = argparse.ArgumentParser(description='Evalute T5 on arithmetic problems.')
     parser.add_argument('--output_dir', type=str, required=True, help='Path to save checkpoint and results.')
     
     parser.add_argument('--checkpoint_name', type=str, required=True)
     parser.add_argument("--seed", default=123, type=int, help="Seed.")
-    parser.add_argument('--max_seq_length', type=int, default=512, help='Maximum sequence length (in tokens).')
+    parser.add_argument('--max_seq_length', type=int, default=1024, help='Maximum sequence length (in tokens).')
     parser.add_argument("--test_size", default=2000, type=int, help="Number of examples for testing.")
     parser.add_argument("--num_workers", default=4, type=int, help="Number of CPU workers for loading data.")
     parser.add_argument("--test_batch_size", default=8, type=int, help="Batch size per GPU/CPU for evaluation.")
@@ -57,6 +60,10 @@ if __name__ == '__main__':
                                              test_dataloader=test_dataloader)
                                             
                                             
-                                
     results = trainer.test(model)
-    print("Test accuracy: ", results[0]['test_exact_match'])
+    ans = f"Test accuracy: {results[0]['test_exact_match']}\n"
+    
+    print(ans)
+
+    with open(os.path.join(args.output_dir, 'test.txt'), 'a') as fout:
+        fout.write(ans)

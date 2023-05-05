@@ -52,9 +52,9 @@ if __name__ == '__main__':
                                             
                                             
                                 
-    result = trainer.predict(model, test_dataloader)[0]
-    result = "Predicted answer" + str(result)
+    predicted = trainer.predict(model, test_dataloader)[0]
+    result = f"The predicted sum of {args.first_number} and {args.second_number} is {predicted}\n"
     print(result)
     
-    with open(os.path.join(args.output_dir, 'prediction.txt'), 'w') as fout:
+    with open(os.path.join(args.output_dir, 'predictions.txt'), 'a') as fout:
         fout.write(result)

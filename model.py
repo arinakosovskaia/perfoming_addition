@@ -2,17 +2,26 @@ import argparse
 import glob
 import json
 import os
-import random
-import torch
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
+import random
+import re
+
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+import torch
 from torch.utils.data import DataLoader, Dataset
 from typing import List
 
 os.environ["TOKENIZERS_PARALLELISM"] = "True"
+
+def convert_string(string : str) -> int:
+    regex = r' ?10e\d* ?'
+    digits_array = re.split(regex, string)[:-1] #without last space
+    answer = ''.join(digits_array)
+    return int(answer)
 
 def compute_exact_match(predicted_answer, correct_answer) -> bool:
     predicted_answer = predicted_answer.strip().lower()
@@ -40,7 +49,7 @@ class T5Finetuner(pl.LightningModule):
         labels = self.tokenizer.batch_encode_plus(
             list(answers), padding=True, truncation=False,
             return_tensors='pt')['input_ids']
-        
+
         assert input_dict['input_ids'].shape[1] <= self.hparams.max_seq_length
         assert labels.shape[1] <= self.hparams.max_seq_length
 
@@ -68,11 +77,11 @@ class T5Finetuner(pl.LightningModule):
         return {'loss': loss, 'log': tensorboard_logs}
     
     def predict_step(self, batch, batch_nb):
-        question, correct_answer = batch
+        questions, correct_answers = batch
 
-        input_ids, attention_mask, labels = self.prepare_batch(
-            questions=question, answers=correct_answer)
-            
+        input_ids, attention_mask, _ = self.prepare_batch(
+            questions=questions, answers=correct_answers)
+
         batch_outputs = self.model.generate(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -82,8 +91,8 @@ class T5Finetuner(pl.LightningModule):
         predicted_answers = [
             self.tokenizer.decode(output, skip_special_tokens=True, clean_up_tokenization_spaces=True)
             for output in batch_outputs]
-        
-        return predicted_answers
+
+        return convert_string(predicted_answers[0])
 
 
     def inference_step(self, batch, batch_nb: int):

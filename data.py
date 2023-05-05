@@ -2,17 +2,21 @@ import argparse
 import glob
 import json
 import os
-import random
-import torch
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
+import random
+import re
+
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+import torch
 from torch.utils.data import DataLoader, Dataset
 from typing import List
 
 os.environ["TOKENIZERS_PARALLELISM"] = "True"
+
 
 def convert_number(number: int) -> str:
     number = str(number)
@@ -45,7 +49,7 @@ def make_sample(first_term, second_term):
     return f'What is {first_term} {operation_term} {second_term}?', answer
 
 class MyDataset(Dataset):
-    def __init__(self, n_examples: int, min_digits: int, max_digits: int, examples=None):
+    def __init__(self, n_examples: int = 1, min_digits: int = 2, max_digits: int = 60, examples=None):
         self.max_digits = max_digits
 
         if examples:

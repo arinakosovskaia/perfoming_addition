@@ -16,7 +16,11 @@ from typing import List
 from model import T5Finetuner
 from data import MyDataset
 
+import warnings
+
 if __name__ == '__main__':
+    warnings.filterwarnings("ignore")
+    
     #parse arguments
     parser = argparse.ArgumentParser(description='Train T5 on arithmetic problems.')
     parser.add_argument('--output_dir', type=str, required=True, help='Path to save checkpoint and results.')
@@ -31,7 +35,7 @@ if __name__ == '__main__':
         '--max_digits_train', type=int, required=True,
         help='Maximum number of digits sampled for training and validation examples.')
     parser.add_argument(
-        '--max_digits_test', type=int, required=True,
+        '--max_digits_test', type=int, default=50,
         help='Maximum number of digits sampled for test examples.')
     parser.add_argument("--seed", default=123, type=int, help="Seed.")
     parser.add_argument("--train_size", default=1000, type=int, help="Number of examples for training.")
