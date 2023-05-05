@@ -23,6 +23,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--checkpoint_name', type=str, required=True)
     parser.add_argument("--seed", default=123, type=int, help="Seed.")
+    parser.add_argument('--max_seq_length', type=int, default=512, help='Maximum sequence length (in tokens).')
     parser.add_argument("--test_size", default=2000, type=int, help="Number of examples for testing.")
     parser.add_argument("--num_workers", default=4, type=int, help="Number of CPU workers for loading data.")
     parser.add_argument("--test_batch_size", default=8, type=int, help="Batch size per GPU/CPU for evaluation.")
